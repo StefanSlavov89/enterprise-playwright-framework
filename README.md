@@ -1,6 +1,10 @@
 # 🧪 Playwright TypeScript Automation Framework
 
-A scalable end-to-end test automation framework built with Playwright and TypeScript.
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+
+A scalable, production-ready end-to-end test automation framework built with Playwright and TypeScript.
 
 The framework follows a layered architecture with clear separation between UI interactions, business flows, test data, and test scenarios.
 
@@ -89,24 +93,17 @@ Rules:
 
 ## 📁 Folder Structure
 
-pages/
-
-steps/
-
-data/
-
-├── factories/
-
-├── models/
-
-fixtures/
-
-tests/
-
-├── smoke/
-
-├── regression/
-
+```text
+├── data/
+│   ├── factories/      # Test data generation (UserFactory, etc.)
+│   └── models/         # TypeScript interfaces/types for data
+├── fixtures/           # Custom Playwright fixtures (Dependency Injection)
+├── pages/              # UI Layer: Pure locators and basic actions
+├── steps/              # Business Layer: Reusable user workflows
+└── tests/              # Scenario Layer: Test cases & assertions
+    ├── regression/     # Full regression suite
+    └── smoke/          # Critical path tests
+```
 
 ---
 
@@ -122,20 +119,22 @@ tests/
 
 ### 1. Clone repository
 
+```
 git clone <repo-url>
 cd enterprise-playwright-framework
+```
 
 ### 2. Install dependencies
 
-npm install
+`npm install`
 
 ### 3. Install Playwright browsers
 
-npx playwright install
+`npx playwright install`
 
 ### 4. Verify installation
 
-npx playwright test
+`npx playwright test`
 
 ---
 
@@ -143,23 +142,23 @@ npx playwright test
 
 ### 1. Run all test
 
-npx playwright test
+`npx playwright test`
 
 ### 2. Run tests in a specific folder
 
-npx playwright test tests/regression
+`npx playwright test tests/regression`
 
 ### 3. Run smoke tests
 
-npx playwright test --grep @smoke
+`npx playwright test --grep @smoke`
 
 ### 4. Run regression tests
 
-npx playwright test --grep @regression
+`npx playwright test --grep @regression`
 
 ### 5. Run tests with UI mode
 
-npx playwright test --ui
+`npx playwright test --ui`
 
 ## 🧪 Test Strategy
 
