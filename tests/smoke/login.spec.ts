@@ -1,11 +1,10 @@
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../pages/LoginPage';
+import { test, expect } from '../../fixtures/testFixtures';
+import { UserFactory } from '../../data/factories/UserFactory';
 
-test('Valid user can log in', async ({ page }) => {
-  const loginPage = new LoginPage(page);
+test('@smoke Valid user can log in', async ({ authSteps, page }) => {
+  const user = UserFactory.standardUser();
 
-  await loginPage.goto();
-  await loginPage.login('standard_user', 'secret_sauce');
+  await authSteps.loginAs(user);
 
   await expect(page).toHaveURL(/inventory/);
 });
