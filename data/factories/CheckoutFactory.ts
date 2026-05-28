@@ -16,4 +16,20 @@ export class CheckoutFactory {
       postalCode: '1000',
     };
   }
+
+  static missingLastName(): CheckoutData {
+    return {
+      firstName: 'Stefan',
+      lastName: '',
+      postalCode: '1000',
+    };
+  }
+
+  static invalidPostalCode(): CheckoutData {
+    return {
+      firstName: 'Stefan',
+      lastName: 'Slavov',
+      postalCode: '',
+    };
+  }
 }
