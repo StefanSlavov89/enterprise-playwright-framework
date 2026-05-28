@@ -20,5 +20,63 @@ test('@regression Should show error when first name is missing', async ({
   await checkoutSteps.fillCheckoutData(checkout);
   await checkoutSteps.submitCheckout();
 
-  checkoutInfoPage.expectError();
+  await checkoutInfoPage.expectError();
 });
+
+test('@regression Should show error when last name is missing', async ({
+  authSteps,
+  cartSteps,
+  page,
+  checkoutSteps,
+}) => {
+  const checkoutInfoPage = new CheckoutInfoPage(page);
+  const user = UserFactory.standardUser();
+  const checkout = CheckoutFactory.missingLastName();
+
+  await authSteps.loginAs(user);
+  await cartSteps.addFirstItemToCart();
+  await cartSteps.goToCart();
+  await cartSteps.goToCheckout();
+  await checkoutSteps.fillCheckoutData(checkout);
+  await checkoutSteps.submitCheckout();
+
+  await checkoutInfoPage.expectError();
+});
+
+test('@regression Should show error when missing postal code', async ({
+  authSteps,
+  cartSteps,
+  page,
+  checkoutSteps,
+}) => {
+  const checkoutInfoPage = new CheckoutInfoPage(page);
+  const user = UserFactory.standardUser();
+  const checkout = CheckoutFactory.invalidPostalCode();
+
+  await authSteps.loginAs(user);
+  await cartSteps.addFirstItemToCart();
+  await cartSteps.goToCart();
+  await cartSteps.goToCheckout();
+  await checkoutSteps.fillCheckoutData(checkout);
+  await checkoutSteps.submitCheckout();
+
+  await checkoutInfoPage.expectError();
+});
+
+// User can actually finish the checkout process with an empty cart lol ...
+test.fail(
+  '@regression User is unable to complete checkout with empty cart',
+  async ({ authSteps, cartSteps, page, checkoutSteps }) => {
+    const checkoutInfoPage = new CheckoutInfoPage(page);
+    const user = UserFactory.standardUser();
+    const checkout = CheckoutFactory.invalidPostalCode();
+
+    await authSteps.loginAs(user);
+    await cartSteps.goToCart();
+    await cartSteps.goToCheckout();
+    await checkoutSteps.fillCheckoutData(checkout);
+    await checkoutSteps.submitCheckout();
+
+    await checkoutInfoPage.expectError();
+  },
+);

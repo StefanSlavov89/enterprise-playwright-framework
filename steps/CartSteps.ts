@@ -18,4 +18,12 @@ export class CartSteps {
   async goToCheckout() {
     await this.cartPage.proceedToCheckout();
   }
+
+  async expectItemsCount(count: number) {
+    await this.cartPage.expectItemsCount(count);
+  }
+
+  async addProductByIndex(index: number) {
+    await this.inventoryPage.addProductByIndex(index);
+  }
 }

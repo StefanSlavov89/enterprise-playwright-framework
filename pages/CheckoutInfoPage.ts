@@ -30,7 +30,7 @@ export class CheckoutInfoPage {
   }
 
   async expectError() {
-    await expect(this.errorMessage).toBeVisible();
+    await expect(this.errorMessage).toBeVisible({ timeout: 2000 });
   }
 
   async expectErrorText(text: string) {

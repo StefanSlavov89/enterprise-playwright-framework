@@ -8,3 +8,11 @@ test('@smoke Valid user can log in', async ({ authSteps, page }) => {
 
   await expect(page).toHaveURL(/inventory/);
 });
+
+test('@regression Invalid user can not log in', async ({ authSteps, loginPage }) => {
+  const user = UserFactory.lockedUser();
+
+  await authSteps.loginAs(user);
+
+  await loginPage.expectError();
+});
