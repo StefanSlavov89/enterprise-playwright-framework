@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base, Page } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { CheckoutInfoPage } from '../pages/CheckoutInfoPage';
 import { CheckoutOverviewPage } from '../pages/CheckoutOverviewPage';
@@ -14,6 +14,11 @@ export const test = base.extend<{
   cartSteps: CartSteps;
   loginPage: LoginPage;
   cartPage: CartPage;
+  authedContext: Page;
+  loggedInPage: Page;
+  speedyPage: Page;
+  authedCartSteps: CartSteps;
+  authedSpeedyCartSteps: CartSteps;
 }>({
   checkoutSteps: async ({ page }, use) => {
     const steps = new CheckoutSteps(new CheckoutInfoPage(page), new CheckoutOverviewPage(page));
@@ -34,6 +39,48 @@ export const test = base.extend<{
   cartPage: async ({ page }, use) => {
     const cartPage = new CartPage(page);
     await use(cartPage);
+  },
+  authedContext: async ({ page }, use) => {
+    await page.context().addCookies([
+      {
+        name: 'session-username',
+        value: 'standard_user',
+        domain: 'www.saucedemo.com',
+        path: '/',
+      },
+    ]);
+    await use(page);
+  },
+  loggedInPage: async ({ authedContext }, use) => {
+    await authedContext.goto('/inventory.html');
+    await use(authedContext);
+  },
+  speedyPage: async ({ authedContext }, use) => {
+    await authedContext.context().route('**/*', (route) => {
+      const url = route.request().url();
+      const type = route.request().resourceType();
+
+      if (type === 'image' || url.match(/\.(png|jpg|jpeg|svg)(\?.*)?$/)) {
+        console.log(`Blocked image -> ${type} | URL: ${url}`);
+        route.fulfill({
+          status: 200,
+          contentType: 'image/jpeg',
+          body: '',
+        });
+      } else {
+        route.continue();
+      }
+    });
+    await authedContext.goto('/inventory.html', { waitUntil: 'domcontentloaded' });
+    await use(authedContext);
+  },
+  authedCartSteps: async ({ loggedInPage }, use) => {
+    const steps = new CartSteps(new CartPage(loggedInPage), new InventoryPage(loggedInPage));
+    await use(steps);
+  },
+  authedSpeedyCartSteps: async ({ speedyPage }, use) => {
+    const steps = new CartSteps(new CartPage(speedyPage), new InventoryPage(speedyPage));
+    await use(steps);
   },
 });
 
