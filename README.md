@@ -12,13 +12,15 @@ The framework implements a strictly layered architecture with a clear separation
 
 ## 🚀 Tech Stack
 
-* **Playwright** – Core test automation engine and browser orchestration
-* **TypeScript** – Strongly typed script execution and safety
-* **Node.js** – JavaScript runtime environment
-* **Page Object Model (POM)** – Design pattern for UI element abstraction
-* **Custom Fixtures** – Dependency Injection and automatic state management
-* **Data Factories** – Centralized test data generation layer
-* **GitHub Actions** – Continuous Integration engine
+- **Playwright** – Core test automation engine and browser orchestration
+- **TypeScript** – Strongly typed script execution and safety
+- **Node.js** – JavaScript runtime environment
+- **Page Object Model (POM)** – Design pattern for UI element abstraction
+- **Custom Fixtures** – Dependency Injection and automatic state management
+- **Data Factories** – Centralized test data generation layer
+- **GitHub Actions** – Continuous Integration engine
+- **API Testing Layer** – Built-in isolated REST API verification mechanism
+- **Visual Regression Testing** – Pixel-by-pixel snapshot comparison layout
 
 ---
 
@@ -27,21 +29,30 @@ The framework implements a strictly layered architecture with a clear separation
 The framework is decoupled into four highly maintainable layers:
 
 ### 1. UI Components & Pages Layer (`components/`, `pages/`)
-* **Pages**: Responsible strictly for direct interaction with the DOM. Contains page locators and atomic UI actions (e.g., `click()`, `fill()`). No business rules, flow logic, or assertions are allowed here.
-* **Components**: Encapsulates reusable web elements shared across multiple views (e.g., headers, footers, navigation bars).
+
+- **Pages**: Responsible strictly for direct interaction with the DOM. Contains page locators and atomic UI actions (e.g., `click()`, `fill()`). No business rules, flow logic, or assertions are allowed here.
+- **Components**: Encapsulates reusable web elements shared across multiple views (e.g., headers, footers, navigation bars).
 
 ### 2. Business Actions Layer (`steps/`)
-* Encapsulates end-to-end user workflows composed of multi-page interactions.
-* Abstracts low-level technical operations into readable business steps (e.g., `AuthenticationSteps`, `CartSteps`).
-* Serves as the orchestration bridge between raw page components and functional test files.
+
+- Encapsulates end-to-end user workflows composed of multi-page interactions.
+- Abstracts low-level technical operations into readable business steps (e.g., `AuthenticationSteps`, `CartSteps`).
+- Serves as the orchestration bridge between raw page components and functional test files.
 
 ### 3. Data Layer (`data/`)
-* **Factories**: Dynamically generates robust test data (e.g., `UserFactory`, `CheckoutFactory`) to eliminate hardcoded string values in assertions.
-* **Models**: Contains strict TypeScript interfaces defining data structures for full compile-time type-checking support.
+
+- **Factories**: Dynamically generates robust test data (e.g., `UserFactory`, `CheckoutFactory`) to eliminate hardcoded string values in assertions.
+- **Models**: Contains strict TypeScript interfaces defining data structures for full compile-time type-checking support.
 
 ### 4. Scenario Layer (`tests/`)
-* Defines functional test specifications partitioned by business domain.
-* **Rules**: Absolutely no CSS/XPath locators or low-level UI implementation details are permitted in tests. Assertions live exclusively in this layer.
+
+- Defines functional test specifications partitioned by business domain.
+- **Rules**: Absolutely no CSS/XPath locators or low-level UI implementation details are permitted in tests. Assertions live exclusively in this layer.
+
+### 5. API Layer (`tests/api/`)
+
+- Contains isolated backend service validations (e.g., GET, POST requests).
+- Validates negative responses, authorization headers (`x-api-key`), and response payload consistency without relying on the UI.
 
 ---
 
@@ -66,6 +77,7 @@ The framework is decoupled into four highly maintainable layers:
 ---
 
 ## 🔄 CI/CD Integration
+
 Continuous Integration is handled via GitHub Actions.
 
 The .github/workflows/playwright.yml pipeline triggers automatically on every push and pull_request targetting the main branch.
@@ -116,6 +128,7 @@ cd enterprise-playwright-framework
 ---
 
 ## 🏃‍♂️ Running tests
+
 The framework utilizes pre-configured shorthand npm commands mapped inside package.json:
 
 ### 1. Run all tests
@@ -139,6 +152,18 @@ The framework utilizes pre-configured shorthand npm commands mapped inside packa
 `npm run test:ui`
 
 ### 6. View local html report
+
+`npm run report`
+
+### 7. Run API tests only
+
+`npm run test:api`
+
+### 8. Run Visual Regression tests only
+
+`npm run test:visual:update`
+
+### Update Visual Regression snapshots
 
 `npm run report`
 
@@ -177,7 +202,6 @@ This framework is designed to be:
 
 Planned enhancements:
 
-- API testing layer integration for hybrid E2E scenarios.
-- Advanced flaky test handling and automatic retry strategies.
-- Visual regression testing execution.
-- Matrix-based parallel execution tuning in CI.
+- Matrix-based multi-platform (Windows/macOS/Linux) execution tuning in CI.
+- Automated Slack/Teams notification integration post-CI pipeline execution.
+- Advanced performance metrics capturing during API execution layers.

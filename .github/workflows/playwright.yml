@@ -7,6 +7,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke-tests:
     timeout-minutes: 20
@@ -41,8 +45,8 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps
 
-      - name: Run smoke tests
-        run: npx playwright test --grep @smoke
+      - name: Run Playwright tests (Smoke, Regression, API)
+        run: npx playwright test --grep-invert @visual
 
       - name: Upload Playwright report
         if: always()

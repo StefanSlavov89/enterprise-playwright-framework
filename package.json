@@ -9,7 +9,10 @@
     "test:regression": "playwright test --grep @regression",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:api": "npx playwright test --grep @api",
+    "test:visual": "npx playwright test --grep @visual",
+    "test:visual:update": "npx playwright test --grep @visual -u"
   },
   "keywords": [],
   "author": "",
