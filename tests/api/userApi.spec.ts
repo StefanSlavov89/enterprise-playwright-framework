@@ -63,7 +63,7 @@ test.describe.parallel('@api API client tests (ReqRes)', () => {
     // expect(response.status()).not.toBe(200);
 
     const body = await response.json();
-    expect(body).toHaveProperty('error');
     console.log(body);
+    expect(body).toHaveProperty('error');
   });
 });
