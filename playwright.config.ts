@@ -31,6 +31,10 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: 'https://www.saucedemo.com',
+    launchOptions: {
+      // Adds a delay in milliseconds between every single action
+      // slowMo: 1000, // 500ms = half a second
+    },
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

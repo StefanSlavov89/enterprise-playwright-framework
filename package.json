@@ -12,7 +12,10 @@
     "report": "playwright show-report",
     "test:api": "npx playwright test --grep @api",
     "test:visual": "npx playwright test --grep @visual",
-    "test:visual:update": "npx playwright test --grep @visual -u"
+    "test:visual:update": "npx playwright test --grep @visual -u",
+    "docker:test": "docker-compose run --rm test-runner npx playwright test",
+    "docker:visual:update": "docker-compose run --rm test-runner npx playwright test --grep @visual -u",
+    "docker:build": "docker-compose build"
   },
   "keywords": [],
   "author": "",

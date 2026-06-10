@@ -6,13 +6,13 @@ test.describe('@visual Visual regression tests', () => {
   });
 
   test('Visual test for Login page', async ({ page }) => {
-    await expect(page).toHaveScreenshot('login-page.png', {
+    await expect(page).toHaveScreenshot({
       maxDiffPixels: 100,
     });
   });
 
   test('Visual test for the page logo', async ({ authSteps }) => {
     const logoLocator = authSteps.getLogoLocator();
-    await expect(logoLocator).toHaveScreenshot('saucedemo-logo.png');
+    await expect(logoLocator).toHaveScreenshot();
   });
 });
