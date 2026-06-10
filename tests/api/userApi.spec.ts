@@ -64,5 +64,6 @@ test.describe.parallel('@api API client tests (ReqRes)', () => {
 
     const body = await response.json();
     expect(body).toHaveProperty('error');
+    console.log(body);
   });
 });
