@@ -26,4 +26,8 @@ export class CartSteps {
   async addProductByIndex(index: number) {
     await this.inventoryPage.addProductByIndex(index);
   }
+
+  async expectCartBadgeCount(count: number) {
+    await this.inventoryPage.expectCartCount(count);
+  }
 }
