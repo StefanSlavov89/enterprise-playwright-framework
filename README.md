@@ -24,6 +24,14 @@ The framework implements a strictly layered architecture with a clear separation
 
 ---
 
+## 🐳 Containerization with Docker
+
+To eliminate the common "It works on my machine" syndrome—especially regarding **Visual Regression Testing**—the entire execution environment is containerized.
+
+Different operating systems (macOS, Windows, Linux) render fonts, anti-aliasing, and shadows differently at a pixel level. This framework uses **Docker Compose** to treat a specific Linux Noble image as the single "Source of Truth" for all visual baselines.
+
+---
+
 ## 🏗️ Architecture Overview
 
 The framework is decoupled into four highly maintainable layers:
@@ -161,11 +169,23 @@ The framework utilizes pre-configured shorthand npm commands mapped inside packa
 
 ### 8. Run Visual Regression tests only
 
+`npm run test:visual`
+
+### 9. Update Visual Regression snapshots
+
 `npm run test:visual:update`
 
-### Update Visual Regression snapshots
+### 10. Build or rebuild the Docker execution image from the Dockerfile
 
-`npm run report`
+`npm run docker:build`
+
+### 11. Run the entire test suite inside an isolated Linux container
+
+`npm run docker:test`
+
+### 12. Update visual regression snapshots using the Linux rendering baseline inside the container
+
+`npm run docker:visual:update`
 
 ## 🧪 Test Strategy
 

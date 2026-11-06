@@ -1,0 +1,9 @@
+services:
+  test-runner:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CI=true
+    ipc: host
