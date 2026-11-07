@@ -121,5 +121,6 @@ On Windows/PowerShell, quote grep patterns that contain `@` (`--grep "@smoke"`).
 - The ReqRes API key is currently inlined in `tests/api/userApi.spec.ts`. New secrets go in `.env` (git-ignored), not in source.
 
 ## Git & Commit Rules
+
 - Never add "Co-Authored-By" or any AI attribution trailers to Git commit messages.
 - Format commit messages cleanly without extra metadata.
