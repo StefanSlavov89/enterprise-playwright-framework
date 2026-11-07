@@ -116,7 +116,7 @@ On Windows/PowerShell, quote grep patterns that contain `@` (`--grep "@smoke"`).
 - The Docker image tag in `Dockerfile` (`mcr.microsoft.com/playwright:vX.Y.Z-noble`) must match the installed `@playwright/test` version. Bump it whenever `package.json` changes Playwright's version, or browsers and snapshots will mismatch.
 - CI config: retries = 2, workers = 2, and traces are recorded `on-first-retry`. Locally there are 0 retries, so reproduce flakiness with `--repeat-each`.
 - `tsconfig.json` uses `"module"`/`"moduleResolution": "nodenext"`. Don't switch back to `"node"`, which TypeScript 6 rejects as deprecated (TS5107).
-- Prettier's default `endOfLine` is `lf`, so on a Windows checkout with CRLF line endings `npx prettier --check .` flags almost every file. Use `--end-of-line auto` to check only real formatting.
+- Line endings are LF everywhere, enforced by `.gitattributes` (`* text=auto eol=lf`) regardless of each machine's `core.autocrlf`. Keep files LF, including on Windows. This matches Prettier's default and the Linux Docker container.
 - `playwright-report/` and `test-results/` are generated output (git-ignored). Don't edit or commit them.
 - The ReqRes API key is currently inlined in `tests/api/userApi.spec.ts`. New secrets go in `.env` (git-ignored), not in source.
 
