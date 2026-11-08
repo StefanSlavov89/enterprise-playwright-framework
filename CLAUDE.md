@@ -70,7 +70,7 @@ tests/<feature>/  Spec files grouped by feature: auth, cart, checkout, api, visu
 ### Visual tests (`tests/visual/`)
 
 - Baselines are OS-specific (`*-chromium-linux.png`, `*-chromium-darwin.png`). CI runs on Linux, so **generate or update Linux baselines through Docker**: `npm run docker:visual:update`.
-- CI excludes visual tests (`--grep-invert @visual`). Run them locally or in Docker.
+- CI runs visual tests in a separate `visual-tests` job inside the `mcr.microsoft.com/playwright` container (same image as the `Dockerfile`). On failure, the expected/actual/diff images are uploaded as the `visual-diffs` artifact.
 - Don't update snapshots to make a failing test pass unless the UI change is intentional.
 
 ## Code style
@@ -113,7 +113,7 @@ On Windows/PowerShell, quote grep patterns that contain `@` (`--grep "@smoke"`).
 
 ## Gotchas
 
-- The Docker image tag in `Dockerfile` (`mcr.microsoft.com/playwright:vX.Y.Z-noble`) must match the installed `@playwright/test` version. Bump it whenever `package.json` changes Playwright's version, or browsers and snapshots will mismatch.
+- The Playwright Docker image tag (`mcr.microsoft.com/playwright:vX.Y.Z-noble`) appears in both `Dockerfile` and the `visual-tests` job in `.github/workflows/playwright.yml`. Both must match the installed `@playwright/test` version. Bump them together whenever Playwright's version changes, or browsers and snapshots will mismatch.
 - CI config: retries = 2, workers = 2, and traces are recorded `on-first-retry`. Locally there are 0 retries, so reproduce flakiness with `--repeat-each`.
 - `tsconfig.json` uses `"module"`/`"moduleResolution": "nodenext"`. Don't switch back to `"node"`, which TypeScript 6 rejects as deprecated (TS5107).
 - Line endings are LF everywhere, enforced by `.gitattributes` (`* text=auto eol=lf`) regardless of each machine's `core.autocrlf`. Keep files LF, including on Windows. This matches Prettier's default and the Linux Docker container.
