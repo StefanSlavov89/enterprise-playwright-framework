@@ -1,5 +1,5 @@
 # Using the oficial Playwright image for Linux
-FROM mcr.microsoft.com/playwright:v1.59.1-noble
+FROM mcr.microsoft.com/playwright:v1.65.0-noble
 
 # Set up working dir
 WORKDIR /app

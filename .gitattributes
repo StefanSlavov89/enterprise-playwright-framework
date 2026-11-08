@@ -1,0 +1,9 @@
+# Normalize all text files to LF in the repo and the working tree, on every OS
+* text=auto eol=lf
+
+# Binary files: never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary
