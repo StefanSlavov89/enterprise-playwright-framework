@@ -44,7 +44,7 @@ test('@smoke User is able to complete full purchase flow with 2 items', async ({
   await cartSteps.addProductByIndex(1);
   await cartSteps.goToCart();
 
-  cartSteps.expectItemsCount(2);
+  await cartSteps.expectItemsCount(2);
 
   await cartSteps.goToCheckout();
   await checkoutSteps.fillCheckoutData(checkout);
