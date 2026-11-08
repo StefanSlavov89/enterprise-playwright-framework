@@ -56,19 +56,14 @@ export const test = base.extend<{
     await use(authedContext);
   },
   speedyPage: async ({ authedContext }, use) => {
-    await authedContext.context().route('**/*', (route) => {
+    await authedContext.context().route('**/*', async (route) => {
       const url = route.request().url();
       const type = route.request().resourceType();
 
       if (type === 'image' || url.match(/\.(png|jpg|jpeg|svg)(\?.*)?$/)) {
-        console.log(`Blocked image -> ${type} | URL: ${url}`);
-        route.fulfill({
-          status: 200,
-          contentType: 'image/jpeg',
-          body: '',
-        });
+        await route.abort();
       } else {
-        route.continue();
+        await route.continue();
       }
     });
     await authedContext.goto('/inventory.html', { waitUntil: 'domcontentloaded' });
