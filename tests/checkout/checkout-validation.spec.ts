@@ -1,4 +1,4 @@
-import { test } from '../../fixtures/testFixtures';
+import { test, expect } from '../../fixtures/testFixtures';
 import { UserFactory } from '../../data/factories/UserFactory';
 import { CheckoutFactory } from '../../data/factories/CheckoutFactory';
 import { CheckoutInfoPage } from '../../pages/CheckoutInfoPage';
@@ -80,5 +80,6 @@ test.fixme('@regression User is unable to complete checkout with empty cart', as
   await checkoutSteps.fillCheckoutData(checkout);
   await checkoutSteps.submitCheckout();
 
-  await checkoutInfoPage.expectError();
+  // Expected error text is unknown: SauceDemo currently allows checkout with an empty cart
+  await expect(checkoutInfoPage.errorMessage).toBeVisible();
 });
