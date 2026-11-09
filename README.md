@@ -82,6 +82,8 @@ The framework is decoupled into four highly maintainable layers:
 └── utils/               # Common helper functions and custom utilities
 ```
 
+> `CLAUDE.md` and `.claude/` contain instructions and review agents for [Claude Code](https://claude.com/claude-code) (AI-assisted development). They don't affect the framework and can be ignored if you don't use it.
+
 ---
 
 ## 🔄 CI/CD Integration

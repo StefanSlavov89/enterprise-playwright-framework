@@ -8,3 +8,7 @@ node_modules/
 /playwright/.auth/
 /test-results/
 .env
+
+# Claude Code: personal, machine-local files (shared files like CLAUDE.md and .claude/agents/ are committed)
+CLAUDE.local.md
+.claude/settings.local.json
