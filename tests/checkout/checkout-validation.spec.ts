@@ -1,4 +1,4 @@
-import { test } from '../../fixtures/testFixtures';
+import { test, expect } from '../../fixtures/testFixtures';
 import { UserFactory } from '../../data/factories/UserFactory';
 import { CheckoutFactory } from '../../data/factories/CheckoutFactory';
 import { CheckoutInfoPage } from '../../pages/CheckoutInfoPage';
@@ -11,16 +11,16 @@ test('@regression Should show error when first name is missing', async ({
 }) => {
   const checkoutInfoPage = new CheckoutInfoPage(page);
   const user = UserFactory.standardUser();
-  const checkout = CheckoutFactory.missingFirstName();
+  const { data, expectedError } = CheckoutFactory.missingFirstName();
 
   await authSteps.loginAs(user);
   await cartSteps.addFirstItemToCart();
   await cartSteps.goToCart();
   await cartSteps.goToCheckout();
-  await checkoutSteps.fillCheckoutData(checkout);
+  await checkoutSteps.fillCheckoutData(data);
   await checkoutSteps.submitCheckout();
 
-  await checkoutInfoPage.expectError();
+  await checkoutInfoPage.expectErrorText(expectedError);
 });
 
 test('@regression Should show error when last name is missing', async ({
@@ -31,16 +31,16 @@ test('@regression Should show error when last name is missing', async ({
 }) => {
   const checkoutInfoPage = new CheckoutInfoPage(page);
   const user = UserFactory.standardUser();
-  const checkout = CheckoutFactory.missingLastName();
+  const { data, expectedError } = CheckoutFactory.missingLastName();
 
   await authSteps.loginAs(user);
   await cartSteps.addFirstItemToCart();
   await cartSteps.goToCart();
   await cartSteps.goToCheckout();
-  await checkoutSteps.fillCheckoutData(checkout);
+  await checkoutSteps.fillCheckoutData(data);
   await checkoutSteps.submitCheckout();
 
-  await checkoutInfoPage.expectError();
+  await checkoutInfoPage.expectErrorText(expectedError);
 });
 
 test('@regression Should show error when missing postal code', async ({
@@ -51,16 +51,16 @@ test('@regression Should show error when missing postal code', async ({
 }) => {
   const checkoutInfoPage = new CheckoutInfoPage(page);
   const user = UserFactory.standardUser();
-  const checkout = CheckoutFactory.invalidPostalCode();
+  const { data, expectedError } = CheckoutFactory.missingPostalCode();
 
   await authSteps.loginAs(user);
   await cartSteps.addFirstItemToCart();
   await cartSteps.goToCart();
   await cartSteps.goToCheckout();
-  await checkoutSteps.fillCheckoutData(checkout);
+  await checkoutSteps.fillCheckoutData(data);
   await checkoutSteps.submitCheckout();
 
-  await checkoutInfoPage.expectError();
+  await checkoutInfoPage.expectErrorText(expectedError);
 });
 
 // User can actually finish the checkout process with an empty cart lol ...
@@ -80,5 +80,6 @@ test.fixme('@regression User is unable to complete checkout with empty cart', as
   await checkoutSteps.fillCheckoutData(checkout);
   await checkoutSteps.submitCheckout();
 
-  await checkoutInfoPage.expectError();
+  // Expected error text is unknown: SauceDemo currently allows checkout with an empty cart
+  await expect(checkoutInfoPage.errorMessage).toBeVisible();
 });

@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { LoginFailureCase, User } from '../models/User';
 
 export class UserFactory {
   static standardUser(): User {
@@ -8,10 +8,17 @@ export class UserFactory {
     };
   }
 
-  static lockedUser(): User {
+  static lockedUser(): LoginFailureCase {
     return {
-      username: 'locked_out_user',
-      password: 'secret_sauce',
+      user: { username: 'locked_out_user', password: 'secret_sauce' },
+      expectedError: 'Epic sadface: Sorry, this user has been locked out.',
+    };
+  }
+
+  static invalidCredentials(): LoginFailureCase {
+    return {
+      user: { ...UserFactory.standardUser(), password: 'wrong_password' },
+      expectedError: 'Epic sadface: Username and password do not match any user in this service',
     };
   }
 }

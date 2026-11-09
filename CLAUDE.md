@@ -31,7 +31,7 @@ tests/<feature>/  Spec files grouped by feature: auth, cart, checkout, api, visu
 - The constructor takes a `Page` and defines every locator as a `public readonly` `Locator` field. Don't create locators inline inside methods.
 - Locator priority: `getByRole` / `getByText` / `[data-test="..."]` first, then stable `#id`. Avoid brittle CSS chains and XPath.
 - Methods are small, `async`, single-purpose page interactions (`login`, `goToCart`, `addProductByIndex`).
-- Page-level assertions are allowed only as `expect*` methods (e.g. `expectError()`, `expectCartCount(n)`) using web-first `expect` from `@playwright/test`.
+- Page-level assertions are allowed only as `expect*` methods (e.g. `expectErrorText(text)`, `expectCartCount(n)`). Assert the specific outcome (exact text, count, URL), not just that something is visible using web-first `expect` from `@playwright/test`.
 - No test data, no business flows spanning multiple pages, and no knowledge of other Page Objects.
 
 ### Steps (`steps/`)

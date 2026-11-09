@@ -9,10 +9,21 @@ test('@smoke Valid user can log in', async ({ authSteps, page }) => {
   await expect(page).toHaveURL(/inventory/);
 });
 
-test('@regression Invalid user can not log in', async ({ authSteps, loginPage }) => {
-  const user = UserFactory.lockedUser();
+test('@regression Locked out user can not log in', async ({ authSteps, loginPage }) => {
+  const { user, expectedError } = UserFactory.lockedUser();
 
   await authSteps.loginAs(user);
 
-  await loginPage.expectError();
+  await loginPage.expectErrorText(expectedError);
+});
+
+test('@regression User with invalid credentials can not log in', async ({
+  authSteps,
+  loginPage,
+}) => {
+  const { user, expectedError } = UserFactory.invalidCredentials();
+
+  await authSteps.loginAs(user);
+
+  await loginPage.expectErrorText(expectedError);
 });

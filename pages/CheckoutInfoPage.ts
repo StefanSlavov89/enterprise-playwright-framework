@@ -29,10 +29,6 @@ export class CheckoutInfoPage {
     await this.continueButton.click();
   }
 
-  async expectError() {
-    await expect(this.errorMessage).toBeVisible({ timeout: 2000 });
-  }
-
   async expectErrorText(text: string) {
     await expect(this.errorMessage).toHaveText(text);
   }

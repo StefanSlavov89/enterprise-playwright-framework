@@ -60,10 +60,9 @@ test.describe.parallel('@api API client tests (ReqRes)', () => {
       },
     });
 
-    // expect(response.status()).not.toBe(200);
+    expect(response.status()).toBe(403);
 
     const body = await response.json();
-    console.log(body);
-    expect(body).toHaveProperty('error');
+    expect(body.error).toBe('invalid_api_key');
   });
 });
