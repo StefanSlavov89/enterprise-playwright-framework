@@ -1,4 +1,4 @@
-import { CheckoutData } from '../models/CheckoutData';
+import { CheckoutData, CheckoutValidationCase } from '../models/CheckoutData';
 
 export class CheckoutFactory {
   static validCheckout(): CheckoutData {
@@ -9,27 +9,24 @@ export class CheckoutFactory {
     };
   }
 
-  static missingFirstName(): CheckoutData {
+  static missingFirstName(): CheckoutValidationCase {
     return {
-      firstName: '',
-      lastName: 'Slavov',
-      postalCode: '1000',
+      data: { ...CheckoutFactory.validCheckout(), firstName: '' },
+      expectedError: 'Error: First Name is required',
     };
   }
 
-  static missingLastName(): CheckoutData {
+  static missingLastName(): CheckoutValidationCase {
     return {
-      firstName: 'Stefan',
-      lastName: '',
-      postalCode: '1000',
+      data: { ...CheckoutFactory.validCheckout(), lastName: '' },
+      expectedError: 'Error: Last Name is required',
     };
   }
 
-  static invalidPostalCode(): CheckoutData {
+  static missingPostalCode(): CheckoutValidationCase {
     return {
-      firstName: 'Stefan',
-      lastName: 'Slavov',
-      postalCode: '',
+      data: { ...CheckoutFactory.validCheckout(), postalCode: '' },
+      expectedError: 'Error: Postal Code is required',
     };
   }
 }
