@@ -11,7 +11,7 @@ export class UserFactory {
   static lockedUser(): LoginFailureCase {
     return {
       user: { username: 'locked_out_user', password: 'secret_sauce' },
-      expectedError: 'Epic sadface: Sorry, this user has been blocked.',
+      expectedError: 'Epic sadface: Sorry, this user has been locked out.',
     };
   }
 
