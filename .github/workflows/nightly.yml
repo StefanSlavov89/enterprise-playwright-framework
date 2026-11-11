@@ -157,40 +157,16 @@ jobs:
           claude_args: |
             --max-turns 30
             --allowedTools "Read,Glob,Grep,Write"
+          # The instructions live in .claude/agents/analyze-nightly.md (also usable locally);
+          # this prompt only adds the run-specific context.
           prompt: |
-            You are analysing the nightly Playwright run of ${{ github.repository }}.
-            Run: ${{ env.RUN_URL }}
-            Job results: e2e-tests=${{ needs.e2e-tests.result }} (failed=${{ needs.e2e-tests.outputs.unexpected }}, flaky=${{ needs.e2e-tests.outputs.flaky }}), visual-tests=${{ needs.visual-tests.result }} (failed=${{ needs.visual-tests.outputs.unexpected }}, flaky=${{ needs.visual-tests.outputs.flaky }}).
+            Read .claude/agents/analyze-nightly.md and follow its instructions exactly.
 
-            Inputs:
-            - nightly-results/nightly-e2e/ and nightly-results/nightly-visual/: each has
-              test-results/results.json (Playwright JSON report) and per-test folders under
-              test-results/ with error-context.md, screenshots and, for visual tests,
-              expected/actual/diff images. Attachment paths in results.json are absolute
-              runner paths; find the same files under the matching nightly-results/ folder.
-              A folder or results.json can be missing if a job crashed before the tests ran:
-              then say so and treat it as an environment/CI problem.
-            - nightly-results/previous-issues.json: the last nightly-failure issues, to tell
-              whether a failure is new or recurring.
-            - The repository source (tests/, pages/, steps/, fixtures/, data/, utils/) and CLAUDE.md
-              for the framework rules.
-
-            For every failed and every flaky test, find the root cause from the error, the
-            error-context.md page snapshot and the related source code. Classify it as one of:
-            - Product bug: the app under test (saucedemo.com / reqres.in) behaves wrongly.
-            - Test bug: the test, page object, steps, fixtures or test data are wrong or outdated.
-            - Flaky: timing or ordering problem; passed on retry or fails intermittently.
-            - Environment: site down, slow, rate-limited, network, CI or browser setup.
-
-            Write your report in GitHub Markdown to nightly-results/analysis.md and do not
-            create or modify any other file. Structure:
-            1. A one-line summary (counts of failed / flaky tests).
-            2. A table: test title | file:line | status (failed/flaky) | category | new or recurring.
-            3. One section per test: error (short excerpt), root cause, evidence
-               (file:line or snapshot detail) and a concrete suggested fix.
-            Keep it under 40000 characters. Report only what the evidence supports; if a cause
-            is uncertain, say so. Do not suggest updating visual snapshots unless the evidence
-            shows an intentional UI change.
+            Run context:
+            - Repository: ${{ github.repository }}
+            - Run: ${{ env.RUN_URL }}
+            - e2e-tests: ${{ needs.e2e-tests.result }} (failed=${{ needs.e2e-tests.outputs.unexpected }}, flaky=${{ needs.e2e-tests.outputs.flaky }})
+            - visual-tests: ${{ needs.visual-tests.result }} (failed=${{ needs.visual-tests.outputs.unexpected }}, flaky=${{ needs.visual-tests.outputs.flaky }})
 
       - name: Post analysis to GitHub issue
         if: always()

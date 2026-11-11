@@ -12,3 +12,5 @@ node_modules/
 # Claude Code: personal, machine-local files (shared files like CLAUDE.md and .claude/agents/ are committed)
 CLAUDE.local.md
 .claude/settings.local.json
+# Nightly artifacts downloaded for local analysis
+nightly-results/
