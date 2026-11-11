@@ -104,6 +104,14 @@ Pipeline capabilities:
 
 - Post-execution HTML test report compilation uploaded securely into GitHub Artifacts (7 days retention policy)
 
+### Nightly run with failure analysis
+
+`.github/workflows/nightly.yml` runs the same tests as a pull request every night at 01:17 UTC (or on demand via **Actions → Nightly Tests → Run workflow**). Results, including a JSON report, are kept as artifacts for 14 days.
+
+If any test fails or is flaky, Claude Code (`anthropics/claude-code-action`) reads the results and the source, classifies each failure (product bug, test bug, flaky, environment) and suggests a fix. The report is posted to an open issue labeled `nightly-failure`, or a new one is created. Claude is report-only: it can read files and write the analysis, nothing else.
+
+Setup: run `claude setup-token` locally and save the token as the repository secret `CLAUDE_CODE_OAUTH_TOKEN`. Scheduled runs only start from `main`.
+
 ---
 
 ## ⚙️ Requirements

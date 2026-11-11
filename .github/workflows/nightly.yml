@@ -1,0 +1,191 @@
+name: Nightly Tests
+
+# Runs the same test set as a PR (all non-visual tests + visual tests) every night.
+# If anything fails or is flaky, Claude analyses the results and the findings are
+# posted to a GitHub issue labeled `nightly-failure`.
+# Scheduled runs only start from the workflow file on the default branch (main).
+
+on:
+  schedule:
+    - cron: '17 1 * * *' # 01:17 UTC daily (off the hour: GitHub delays runs at :00)
+  workflow_dispatch: # "Run workflow" button for manual runs
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+env:
+  # JSON results for the analysis job (the html/line reporters stay as in the PR workflow)
+  PLAYWRIGHT_JSON_OUTPUT_NAME: test-results/results.json
+
+jobs:
+  e2e-tests:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    outputs:
+      unexpected: ${{ steps.stats.outputs.unexpected }}
+      flaky: ${{ steps.stats.outputs.flaky }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get Playwright version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")" >> $GITHUB_ENV
+
+      - name: Cache Playwright Browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Install Playwright OS Dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps
+
+      - name: Run Playwright tests (Smoke, Regression, API)
+        run: npx playwright test --grep-invert @visual --reporter=line,html,json
+
+      - name: Read result stats
+        id: stats
+        if: always()
+        run: node .github/scripts/result-stats.mjs >> "$GITHUB_OUTPUT"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-e2e
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+
+  visual-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    # Same image as the Dockerfile and the PR workflow; keep the tag in sync with @playwright/test.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
+      options: --ipc=host
+    outputs:
+      unexpected: ${{ steps.stats.outputs.unexpected }}
+      flaky: ${{ steps.stats.outputs.flaky }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run visual tests
+        run: npx playwright test --grep @visual --reporter=line,html,json
+
+      - name: Read result stats
+        id: stats
+        if: always()
+        run: node .github/scripts/result-stats.mjs >> "$GITHUB_OUTPUT"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-visual
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14
+
+  analyze-failures:
+    needs: [e2e-tests, visual-tests]
+    # Runs when a job failed or any test was flaky (passed only on retry)
+    if: >-
+      always() && (
+        needs.e2e-tests.result != 'success' ||
+        needs.visual-tests.result != 'success' ||
+        needs.e2e-tests.outputs.flaky != '0' ||
+        needs.visual-tests.outputs.flaky != '0'
+      )
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nightly-*
+          path: nightly-results
+
+      - name: Collect previous nightly issues
+        run: >
+          gh issue list --repo "${{ github.repository }}" --label nightly-failure --state all
+          --limit 10 --json number,title,state,createdAt,body
+          > nightly-results/previous-issues.json || echo '[]' > nightly-results/previous-issues.json
+
+      - name: Analyse failures with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          # Report-only: Claude can read the repo and results and write one file, nothing else
+          claude_args: |
+            --max-turns 30
+            --allowedTools "Read,Glob,Grep,Write"
+          # The instructions live in .claude/agents/analyze-nightly.md (also usable locally);
+          # this prompt only adds the run-specific context.
+          prompt: |
+            Read .claude/agents/analyze-nightly.md and follow its instructions exactly.
+
+            Run context:
+            - Repository: ${{ github.repository }}
+            - Run: ${{ env.RUN_URL }}
+            - e2e-tests: ${{ needs.e2e-tests.result }} (failed=${{ needs.e2e-tests.outputs.unexpected }}, flaky=${{ needs.e2e-tests.outputs.flaky }})
+            - visual-tests: ${{ needs.visual-tests.result }} (failed=${{ needs.visual-tests.outputs.unexpected }}, flaky=${{ needs.visual-tests.outputs.flaky }})
+
+      - name: Post analysis to GitHub issue
+        if: always()
+        run: |
+          if [ -f nightly-results/analysis.md ]; then
+            report=nightly-results/analysis.md
+          else
+            report=nightly-results/fallback.md
+            printf 'The nightly run failed but Claude produced no analysis. See the run log.\n' > "$report"
+          fi
+          { printf 'Nightly run: %s\n\n' "$RUN_URL"; cat "$report"; } > nightly-results/issue.md
+          cat nightly-results/issue.md >> "$GITHUB_STEP_SUMMARY"
+
+          gh label create nightly-failure --color B60205 \
+            --description 'Failure found by the nightly test run' --force
+          open_issue=$(gh issue list --label nightly-failure --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$open_issue" ]; then
+            gh issue comment "$open_issue" --body-file nightly-results/issue.md
+          else
+            gh issue create --title "Nightly test failures ($(date -u +%Y-%m-%d))" \
+              --label nightly-failure --body-file nightly-results/issue.md
+          fi

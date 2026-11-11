@@ -114,6 +114,7 @@ On Windows/PowerShell, quote grep patterns that contain `@` (`--grep "@smoke"`).
 ## Gotchas
 
 - The Playwright Docker image tag (`mcr.microsoft.com/playwright:vX.Y.Z-noble`) appears in both `Dockerfile` and the `visual-tests` job in `.github/workflows/playwright.yml`. Both must match the installed `@playwright/test` version. Bump them together whenever Playwright's version changes, or browsers and snapshots will mismatch.
+- `.github/workflows/nightly.yml` runs the PR test set nightly and, on failures or flaky tests, has Claude follow `.claude/agents/analyze-nightly.md` to write an analysis that a workflow step posts to a `nightly-failure` issue. Claude there only gets `Read,Glob,Grep,Write`; keep it report-only. Keep its test commands and Docker tag in sync with `playwright.yml`.
 - CI config: retries = 2, workers = 2, and traces are recorded `on-first-retry`. Locally there are 0 retries, so reproduce flakiness with `--repeat-each`.
 - `tsconfig.json` uses `"module"`/`"moduleResolution": "nodenext"`. Don't switch back to `"node"`, which TypeScript 6 rejects as deprecated (TS5107).
 - Line endings are LF everywhere, enforced by `.gitattributes` (`* text=auto eol=lf`) regardless of each machine's `core.autocrlf`. Keep files LF, including on Windows. This matches Prettier's default and the Linux Docker container.
